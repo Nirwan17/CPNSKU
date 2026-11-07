@@ -45,7 +45,19 @@ var kv = (function () {
     },
     get: function (k, d) { return k in cache ? cache[k] : d; },
     set: function (k, v) { cache[k] = v; write(function (s) { s.put(v, k); }); },
-    clear: function () { cache = {}; write(function (s) { s.clear(); }); }
+    clear: function () { cache = {}; write(function (s) { s.clear(); }); },
+    all: function () { return Object.assign({}, cache); },
+    load: function (obj) {
+      cache = Object.assign({}, obj);
+      return new Promise(function (res) {
+        if (!db) { res(); return; }
+        try {
+          var tx = db.transaction('kv', 'readwrite'), s = tx.objectStore('kv');
+          s.clear(); Object.keys(obj).forEach(function (k) { s.put(obj[k], k); });
+          tx.oncomplete = res; tx.onerror = res; tx.onabort = res;
+        } catch (e) { res(); }
+      });
+    }
   };
 })();
 
@@ -240,7 +252,8 @@ screens.pengaturan = function () {
     (c.examOn ? '<div class="row"><span>Tanggal ujian</span><input type="date" data-k="examDate" value="' + esc(c.examDate) + '"></div>' : '') +
     '</div>' +
     '<div class="card"><h2>Tentang</h2><div class="muted">CPNSku, versi build ' + esc(b) + '<br>com.ns.cpnsku</div></div>' +
-    '<div class="card"><h2>Data</h2><p class="muted">Backup dan restore hadir di tahap 1d.</p>' +
+    '<div class="card"><h2>Data</h2><div class="acts"><button class="btn" data-z="backup">Backup data</button><button class="btn ghost" data-z="restore">Restore</button></div>' +
+    '<div class="acts" style="margin:.6rem 0"><button class="btn ghost" data-z="impor">Impor soal dan trik</button><button class="btn ghost" data-z="ekspor">Ekspor soal dan trik</button><button class="btn ghost" data-z="prompt">Prompt untuk AI</button></div>' +
     '<button class="btn danger" data-act="reset">Reset semua data</button></div>';
   return { title: 'Pengaturan', html: h };
 };
@@ -277,6 +290,7 @@ function boot() {
   P = (window.Capacitor && window.Capacitor.Plugins) || {};
   kv.init().then(function () {
     loadCfg(); applyFont();
+    (window.App.onReady || []).forEach(function (f) { f(); });
     $('#tabs').innerHTML = TABS.map(function (t) {
       return '<button data-tab="' + t.id + '"><svg viewBox="0 0 24 24"><path d="' + t.icon + '"/></svg>' + t.label + '</button>';
     }).join('');
@@ -304,6 +318,6 @@ window.addEventListener('load', boot);
 window.App = {
   kv: kv, esc: esc, today: today, toast: toast, render: render, goTab: goTab, push: push,
   openModal: openModal, closeModal: closeModal, confirmBox: confirmBox, logActivity: logActivity,
-  tabViews: tabViews, screens: screens, cfg: function () { return cfg; }
+  tabViews: tabViews, screens: screens, onReady: [], cfg: function () { return cfg; }
 };
 })();

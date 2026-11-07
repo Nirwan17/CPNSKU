@@ -66,7 +66,7 @@ A.screens.bab = function (id) {
   var b = D.bab.filter(function (x) { return x.id === id; })[0], read = kv.get('read', {});
   var h = '<div class="card"><h2>' + esc(b.judul) + '</h2>' + (b.cek ? '<div class="tag" style="margin-bottom:.6rem">Cek sumber resmi untuk bagian yang berkaitan dengan regulasi.</div>' : '') + isiHtml(b.isi) + '</div>' +
     '<div class="acts"><button class="btn" data-x="lat:' + b.topik + '">Latihan bab ini</button>' +
-    '<button class="btn ghost" data-x="trik">Trik untuk bab ini</button></div>' +
+    '<button class="btn ghost" data-x="trik:' + b.topik + '">Trik untuk bab ini</button></div>' +
     '<div class="acts" style="margin-top:.75rem"><button class="btn ghost" data-x="read:' + id + '">' +
     (read[id] ? 'Batalkan tanda sudah dibaca' : 'Tandai sudah dibaca') + '</button></div>';
   return { title: subOf(b.topik).nama, html: h };
@@ -270,7 +270,13 @@ document.getElementById('view').addEventListener('click', function (e) {
   var q = S && !S.done ? SO()[S.ids[S.i]] : null;
   if (a === 'bab') A.push('bab', p[1]);
   else if (a === 'read') { var r = kv.get('read', {}); if (r[p[1]]) delete r[p[1]]; else r[p[1]] = true; kv.set('read', r); A.render(true); }
-  else if (a === 'trik') A.toast('Menu Trik hadir di tahap 1d');
+  else if (a === 'trik') {
+    if (p[1]) A.trik.buka(p[1], null);
+    else if (q) {
+      var jq = S.jw[q.id];
+      A.trik.buka(q.t, { id: q.id, ok: S.mode === 'belajar' && jq !== undefined ? !isBad(q, skorSoal(q, jq)) : null });
+    }
+  }
   else if (a === 'lat') { A.goTab('latihan'); mulai('topik', p[1]); }
   else if (a === 'ls') {
     var s = getSet();
