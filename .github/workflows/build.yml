@@ -39,7 +39,7 @@ jobs:
       - name: Siapkan proyek Android
         run: |
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/status-bar@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/status-bar@6 @capacitor/filesystem@6 @capacitor/share@6
           sed -i "s/__BUILD__/${{ github.run_number }}/g" www/index.html
           npx cap init CPNSku com.ns.cpnsku --web-dir=www
           if [ -f capacitor.config.json ]; then
