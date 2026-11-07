@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: build-cpnsku
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,9 +39,12 @@ jobs:
       - name: Siapkan proyek Android
         run: |
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/status-bar@6
           sed -i "s/__BUILD__/${{ github.run_number }}/g" www/index.html
           npx cap init CPNSku com.ns.cpnsku --web-dir=www
+          if [ -f capacitor.config.json ]; then
+            node -e "var fs=require('fs'),f='capacitor.config.json',c=JSON.parse(fs.readFileSync(f));c.backgroundColor='#0a0a0a';fs.writeFileSync(f,JSON.stringify(c,null,2))"
+          fi
           npx cap add android
 
       - name: Pasang ikon bila ada
