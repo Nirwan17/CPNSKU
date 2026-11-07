@@ -1,0 +1,81 @@
+name: Build CPNSku
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "www/**"
+      - "icons.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cek keystore
+        env:
+          KS_PASSWORD: ${{ secrets.KS_PASSWORD }}
+        run: |
+          test -f keystore/cpnsku.jks || { echo "Keystore belum ada. Jalankan workflow Buat Keystore dulu."; exit 1; }
+          test -n "$KS_PASSWORD" || { echo "Secret KS_PASSWORD belum dibuat."; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Siapkan proyek Android
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          sed -i "s/__BUILD__/${{ github.run_number }}/g" www/index.html
+          npx cap init CPNSku com.ns.cpnsku --web-dir=www
+          npx cap add android
+
+      - name: Pasang ikon bila ada
+        run: |
+          if [ -f icons.zip ]; then unzip -o icons.zip -d android/app/src/main/res; fi
+
+      - name: Atur versi
+        run: |
+          CODE=$(( $(date +%s) / 60 ))
+          sed -i "s/versionCode [0-9]\+/versionCode $CODE/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName\|applicationId" android/app/build.gradle
+
+      - name: Terima lisensi SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Tanda tangan APK
+        env:
+          KS_PASSWORD: ${{ secrets.KS_PASSWORD }}
+        run: |
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          SRC=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          "$BT/zipalign" -f -p 4 "$SRC" aligned.apk
+          "$BT/apksigner" sign --ks keystore/cpnsku.jks \
+            --ks-pass env:KS_PASSWORD --key-pass env:KS_PASSWORD \
+            --ks-key-alias cpnsku --out CPNSku.apk aligned.apk
+          "$BT/apksigner" verify --print-certs CPNSku.apk
+
+      - name: Buat rilis untuk diunduh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.run_number }}" CPNSku.apk \
+            --title "CPNSku build ${{ github.run_number }}" \
+            --notes "APK CPNSku build ${{ github.run_number }}"
