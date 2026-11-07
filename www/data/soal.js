@@ -1,0 +1,57 @@
+(function () {
+var A = window.App;
+A.data = A.data || {};
+var SILA = ['Pertama', 'Kedua', 'Ketiga', 'Keempat', 'Kelima'];
+A.data.soal = (A.data.soal || []).concat([
+  { id: 'twk-001', t: 'pancasila', lv: 1, q: 'Sikap menghormati teman yang beribadah menurut agama yang berbeda dari agama kita mencerminkan pengamalan sila ke...', o: SILA, k: 0,
+    b: 'Toleransi antarumat beragama dan tidak memaksakan keyakinan adalah nilai sila pertama, Ketuhanan Yang Maha Esa.' },
+  { id: 'twk-002', t: 'pancasila', lv: 1, q: 'Lambang sila ketiga pada Garuda Pancasila adalah...', o: ['Bintang', 'Rantai', 'Pohon beringin', 'Kepala banteng', 'Padi dan kapas'], k: 2,
+    b: 'Bintang untuk sila 1, rantai sila 2, pohon beringin sila 3, kepala banteng sila 4, padi dan kapas sila 5.' },
+  { id: 'twk-003', t: 'pancasila', lv: 1, q: 'Warga satu RT menyelesaikan perbedaan pendapat tentang jadwal ronda lewat musyawarah, lalu sepakat menaati hasilnya. Sikap ini mencerminkan sila ke...', o: SILA, k: 3,
+    b: 'Musyawarah untuk mufakat dan menghormati keputusan bersama adalah nilai sila keempat.' },
+  { id: 'twk-004', t: 'pancasila', lv: 1, q: 'Rumusan Pancasila sebagai dasar negara tercantum dalam...', o: ['Pasal 1 UUD 1945', 'Alinea pertama Pembukaan UUD 1945', 'Alinea ketiga Pembukaan UUD 1945', 'Alinea keempat Pembukaan UUD 1945', 'Pasal 29 UUD 1945'], k: 3,
+    b: 'Kelima sila dirumuskan pada alinea keempat Pembukaan UUD 1945.' },
+  { id: 'twk-005', t: 'bela', lv: 1, q: 'Hak dan kewajiban warga negara ikut serta dalam upaya pembelaan negara diatur dalam...', o: ['Pasal 27 ayat (3) UUD 1945', 'Pasal 28 UUD 1945', 'Pasal 29 ayat (2) UUD 1945', 'Pasal 31 UUD 1945', 'Pasal 33 UUD 1945'], k: 0,
+    b: 'Pasal 27 ayat (3) menyatakan setiap warga negara berhak dan wajib ikut serta dalam upaya pembelaan negara. Pasal 28 tentang hak asasi manusia, 29 agama, 31 pendidikan, 33 perekonomian.' },
+  { id: 'twk-006', t: 'bela', lv: 2, q: 'Yang bukan termasuk nilai dasar bela negara adalah...', o: ['Cinta tanah air', 'Kesadaran berbangsa dan bernegara', 'Mengutamakan kepentingan golongan sendiri', 'Rela berkorban untuk bangsa dan negara', 'Keyakinan pada Pancasila sebagai ideologi negara'], k: 2,
+    b: 'Lima nilai dasar bela negara: cinta tanah air, kesadaran berbangsa dan bernegara, keyakinan pada Pancasila, rela berkorban, dan kemampuan awal bela negara. Mengutamakan golongan sendiri bertentangan dengan persatuan.' },
+
+  { id: 'tiu-001', t: 'numerik', lv: 1, q: 'Lanjutan deret 3, 6, 12, 24, ... adalah...', o: ['36', '42', '48', '54', '60'], k: 2,
+    b: 'Setiap angka dikali 2, jadi 24 × 2 = 48.' },
+  { id: 'tiu-002', t: 'numerik', lv: 1, q: 'Harga sebuah tas Rp200.000 mendapat diskon 15%. Harga yang dibayar adalah...', o: ['Rp150.000', 'Rp160.000', 'Rp170.000', 'Rp175.000', 'Rp185.000'], k: 2,
+    b: 'Diskon 15% dari 200.000 adalah 30.000, jadi bayar 170.000. Cara cepat: 85% × 200.000.' },
+  { id: 'tiu-003', t: 'numerik', lv: 2, q: 'Perbandingan umur Ani dan Budi adalah 2 : 3. Jika jumlah umur mereka 45 tahun, umur Budi adalah...', o: ['18 tahun', '20 tahun', '24 tahun', '27 tahun', '30 tahun'], k: 3,
+    b: 'Jumlah bagian 2 + 3 = 5, tiap bagian 45 ÷ 5 = 9. Umur Budi 3 × 9 = 27 tahun.' },
+  { id: 'tiu-004', t: 'numerik', lv: 2, q: 'Lanjutan deret 2, 5, 4, 7, 6, 9, ... adalah...', o: ['7', '8', '10', '11', '12'], k: 1,
+    b: 'Pola selang-seling +3, −1, +3, −1, +3, lalu −1, jadi 9 − 1 = 8. Bisa juga dibaca sebagai dua deret: 2, 4, 6, 8 dan 5, 7, 9.' },
+  { id: 'tiu-005', t: 'verbal', lv: 1, q: 'Sinonim kata “efektif” adalah...', o: ['Hemat', 'Mangkus', 'Cepat', 'Mudah', 'Murah'], k: 1,
+    b: 'Efektif berarti berhasil guna atau ada hasilnya, sepadan dengan mangkus. Hemat, cepat, mudah, dan murah berbeda arti.' },
+  { id: 'tiu-006', t: 'verbal', lv: 1, q: 'Dokter : Stetoskop = Petani : ...', o: ['Sawah', 'Padi', 'Cangkul', 'Pupuk', 'Desa'], k: 2,
+    b: 'Hubungannya profesi dan alat kerjanya. Dokter memakai stetoskop, petani memakai cangkul.' },
+
+  { id: 'tkp-001', t: 'layanan', lv: 1, q: 'Seorang warga datang mengurus dokumen, tetapi berkasnya kurang lengkap dan loket hampir tutup. Sikap Anda...',
+    o: ['Menolak karena loket hampir tutup.', 'Meminta warga bertanya kepada petugas lain.', 'Memeriksa berkas, menjelaskan kekurangannya, mencatatnya tertulis, dan memberi tahu jam layanan berikutnya.', 'Menjelaskan secara singkat berkas yang kurang dan mempersilakan warga kembali.', 'Menerima berkas apa adanya agar warga tidak perlu kembali.'],
+    s: [1, 2, 5, 4, 3],
+    b: 'Nilai tertinggi untuk sikap yang membantu sampai tuntas dengan informasi jelas. Menerima berkas yang kurang melanggar prosedur, sedangkan menolak atau melempar ke petugas lain berarti tidak melayani.' },
+  { id: 'tkp-002', t: 'layanan', lv: 1, q: 'Seorang warga mengeluh dengan nada marah karena antrean terlalu lama. Sikap Anda...',
+    o: ['Mengabaikan karena masih banyak warga lain yang harus dilayani.', 'Meminta warga tenang dan menunggu giliran.', 'Mendengarkan keluhannya, meminta maaf atas ketidaknyamanan, menjelaskan penyebabnya, dan mencari cara mempercepat layanan.', 'Mendengarkan keluhannya lalu menjelaskan bahwa layanan berjalan sesuai nomor antrean.', 'Meminta warga menyampaikan keluhan kepada atasan.'],
+    s: [1, 3, 5, 4, 2],
+    b: 'Mendengarkan, meminta maaf, menjelaskan, dan mencari solusi menunjukkan pelayanan yang empatik dan proaktif. Mengabaikan keluhan adalah yang terendah.' },
+  { id: 'tkp-003', t: 'layanan', lv: 2, q: 'Seorang lansia kesulitan mengisi formulir layanan dan tampak bingung. Sikap Anda...',
+    o: ['Meminta lansia mengisi sendiri karena formulir sudah jelas.', 'Meminta lansia mengajak anggota keluarga untuk membantu.', 'Menjelaskan tiap kolom dan mendampingi pengisian tanpa mengubah data yang disampaikan lansia.', 'Mengarahkan lansia ke meja informasi.', 'Mengisi seluruh formulir berdasarkan perkiraan Anda agar cepat selesai.'],
+    s: [1, 3, 5, 4, 2],
+    b: 'Mendampingi tanpa mengubah data menjaga ketepatan sekaligus membantu. Mengisi berdasarkan perkiraan berisiko membuat data salah.' },
+  { id: 'tkp-004', t: 'profesi', lv: 2, q: 'Laporan yang Anda kerjakan harus selesai besok, tetapi rekan kerja meminta bantuan mendesak untuk tugasnya. Sikap Anda...',
+    o: ['Menolak membantu karena tugas sendiri lebih penting.', 'Membantu rekan sepenuhnya dan menunda laporan.', 'Berkonsultasi dengan atasan tentang prioritas, lalu membagi waktu untuk keduanya sesuai arahan.', 'Menyelesaikan laporan dulu, lalu membantu rekan jika masih ada waktu.', 'Meminta rekan lain membantu tanpa menjelaskan alasannya.'],
+    s: [1, 3, 5, 4, 2],
+    b: 'Berkoordinasi dengan atasan menjaga tenggat sekaligus kerja sama. Menyelesaikan laporan dulu cukup baik. Menolak mentah-mentah atau melempar tugas tanpa penjelasan kurang tepat.' },
+  { id: 'tkp-005', t: 'profesi', lv: 2, q: 'Anda menyadari ada kesalahan data pada laporan yang sudah dikirim ke atasan. Sikap Anda...',
+    o: ['Membiarkan karena atasan belum menyadarinya.', 'Menunggu dulu apakah ada pihak lain yang menyadarinya.', 'Segera memberi tahu atasan, memperbaiki data, dan mengirim revisi disertai penjelasan singkat.', 'Memperbaiki data dan mengirim ulang tanpa menyebut adanya kesalahan.', 'Menyampaikan bahwa kesalahan berasal dari sumber data.'],
+    s: [1, 3, 5, 4, 2],
+    b: 'Jujur dan segera bertanggung jawab adalah integritas. Memperbaiki diam-diam kurang transparan, dan menyalahkan sumber data menghindari tanggung jawab.' },
+  { id: 'tkp-006', t: 'profesi', lv: 1, q: 'Rekan kerja mengajak Anda pulang lebih awal dan menitipkan absensinya kepada Anda. Sikap Anda...',
+    o: ['Menyanggupi karena sesama rekan harus saling membantu.', 'Menyanggupi sekali ini saja lalu mengingatkan agar tidak diulangi.', 'Menolak dengan sopan dan menyarankan rekan mengajukan izin resmi kepada atasan.', 'Menolak tanpa memberi penjelasan.', 'Pura-pura tidak mendengar ajakan itu.'],
+    s: [1, 2, 5, 4, 3],
+    b: 'Menolak dengan sopan sambil memberi jalan yang sesuai aturan menunjukkan disiplin dan integritas. Menitip absen melanggar disiplin, sekalipun hanya sekali.' }
+]);
+})();
