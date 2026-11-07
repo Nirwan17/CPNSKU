@@ -98,7 +98,7 @@ A.tabViews.latihan = function () {
   });
   h += '<div class="card">' +
     '<div class="row" data-x="go:flag"><span>Soal ditandai</span><span class="muted">' + Object.keys(kv.get('flag', {})).length + ' soal</span></div>' +
-    '<div class="row" data-x="soon:Latihan Buku Kesalahan hadir di tahap 1c"><span>Buku Kesalahan</span><span class="muted">' + kv.get('salah', []).length + ' soal tersimpan</span></div>' +
+    '<div class="row" data-x="go:buku"><span>Buku Kesalahan</span><span class="muted">' + kv.get('salah', []).length + ' soal tersimpan</span></div>' +
     '<div class="row" data-x="soon:Soal dari materimu hadir di tahap 3"><span>Dari materiku</span><span class="muted">segera</span></div></div>';
   return { title: 'Latihan', html: h };
 };
@@ -107,31 +107,43 @@ A.tabViews.latihan = function () {
 function labelOf(kind, arg) {
   if (kind === 'sub') return 'Campur ' + subOf(D.subtes.filter(function (s) { return s.id === arg; })[0].topik[0].id).nama;
   if (kind === 'topik') return topikNama(arg);
+  if (kind === 'salah') return 'Buku Kesalahan';
   return kind === 'flag' ? 'Soal ditandai' : 'Campur semua subtes';
 }
 function setResume(S) {
   kv.set('resume', S && !S.done ? { label: 'Latihan ' + S.label + ', soal ' + (S.i + 1) + ' dari ' + S.ids.length, tab: 'latihan' } : null);
 }
 function mulai(kind, arg) {
-  var s = getSet(), flag = kv.get('flag', {});
+  var s = getSet(), flag = kv.get('flag', {}), due = {}, tdy = A.today();
+  kv.get('salah', []).forEach(function (x) { if (!x.due || x.due <= tdy) due[x.id] = 1; });
   var pool = D.soal.filter(function (q) {
     if (kind === 'sub' && subOf(q.t).id !== arg) return false;
     if (kind === 'topik' && q.t !== arg) return false;
     if (kind === 'flag' && !flag[q.id]) return false;
+    if (kind === 'salah') return !!due[q.id];
     return !s.lv || q.lv === s.lv;
   });
-  if (!pool.length) { A.toast('Belum ada soal untuk pilihan ini'); return; }
+  if (!pool.length) { A.toast(kind === 'salah' ? 'Tidak ada soal jatuh tempo hari ini' : 'Belum ada soal untuk pilihan ini'); return; }
   var ids = shuffle(pool).slice(0, s.n).map(function (q) { return q.id; });
   var S = { kind: kind, arg: arg, label: labelOf(kind, arg), mode: s.mode, timer: s.timer, ids: ids, i: 0, jw: {}, mulai: Date.now(), done: false };
   kv.set('sesi', S); setResume(S); A.push('sesi');
+}
+function plus(n) {
+  var d = new Date(); d.setDate(d.getDate() + n);
+  return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
 }
 function catat(q, i) {
   var st = kv.get('stat', {}), t = st[q.t] || { n: 0, p: 0 }, sk = skorSoal(q, i);
   t.n++; t.p += sk / (q.s ? 5 : 1); st[q.t] = t; kv.set('stat', st);
   A.logActivity(1);
+  var sl = kv.get('salah', []), it = sl.filter(function (x) { return x.id === q.id; })[0];
   if (isBad(q, sk)) {
-    var sl = kv.get('salah', []).filter(function (x) { return x.id !== q.id; });
-    sl.push({ id: q.id, ts: Date.now(), alasan: '' }); kv.set('salah', sl);
+    sl = sl.filter(function (x) { return x.id !== q.id; });
+    sl.push({ id: q.id, ts: Date.now(), alasan: '', ok: 0, due: plus(1) }); kv.set('salah', sl);
+  } else if (it) {
+    it.ok = (it.ok || 0) + 1;
+    if (it.ok >= 2) sl = sl.filter(function (x) { return x.id !== q.id; }); else it.due = plus(3);
+    kv.set('salah', sl);
   }
 }
 function weak() {
@@ -265,7 +277,7 @@ document.getElementById('view').addEventListener('click', function (e) {
     s[p[1]] = p[1] === 'mode' ? p[2] : (p[1] === 'timer' ? p[2] === 'true' : parseInt(p[2], 10));
     kv.set('lat:set', s); A.render(true);
   }
-  else if (a === 'go') { if (p[1] === 'lanjut') A.push('sesi'); else mulai(p[1], p[2]); }
+  else if (a === 'go') { if (p[1] === 'lanjut') A.push('sesi'); else if (p[1] === 'buku') A.push('buku'); else mulai(p[1], p[2]); }
   else if (a === 'soon') A.toast(p.slice(1).join(':'));
   else if (a === 'jw' && q) jawab(S, q, parseInt(p[1], 10));
   else if (a === 'next' && q) lanjut(S, q);
@@ -284,4 +296,5 @@ document.getElementById('view').addEventListener('click', function (e) {
   else if (a === 'rev') review(p[1]);
   else if (a === 'fin') { kv.set('sesi', null); setResume(null); A.goTab('latihan'); }
 });
+A.belajar = { SO: SO, subOf: subOf, topikNama: topikNama, shuffle: shuffle, skorSoal: skorSoal, isBad: isBad, catat: catat, weak: weak, ALFA: ALFA, ALASAN: ALASAN };
 })();
