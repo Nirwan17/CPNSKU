@@ -4,53 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0a">
+<meta name="build" content="__BUILD__">
 <title>CPNSku</title>
-<style>
-:root{--bg:#0a0a0a;--fg:#e6e9f0;--muted:#8d95a8;--blue:#3b82f6;--line:#232a38;color-scheme:dark}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-main{max-width:34rem;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 2rem) 1.25rem calc(env(safe-area-inset-bottom,0px) + 2rem)}
-h1{font-size:1.5rem;margin:0}
-.sub{color:var(--muted);margin:.25rem 0 2rem}
-.build{font-size:4.5rem;font-weight:700;line-height:1;color:var(--blue);text-shadow:0 0 28px rgba(59,130,246,.45);font-variant-numeric:tabular-nums}
-.build small{display:block;font-size:1rem;font-weight:400;color:var(--muted);text-shadow:none;margin-bottom:.35rem}
-.stat{margin:1.5rem 0 2rem;color:var(--muted)}
-.stat b{color:var(--fg)}
-label{display:block;font-weight:600;margin-bottom:.5rem}
-textarea{width:100%;background:#12151d;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:.75rem;font:inherit;resize:vertical}
-textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
-button{margin-top:.75rem;background:var(--blue);color:#fff;border:0;border-radius:10px;padding:.7rem 1.4rem;font:inherit;font-weight:600}
-button:active{opacity:.8}
-.msg{min-height:1.5rem;color:var(--muted);margin:.5rem 0 0}
-.how{margin-top:2rem;color:var(--muted);font-size:.95rem}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-  <h1>CPNSku</h1>
-  <p class="sub">Uji build dan update berhasil</p>
-  <div class="build"><small>Versi build</small>__BUILD__</div>
-  <p class="stat">Aplikasi sudah dibuka <b id="opens">0</b> kali.</p>
-  <label for="note">Catatan uji</label>
-  <textarea id="note" rows="4" placeholder="Tulis apa saja, lalu tekan Simpan"></textarea>
-  <button id="save" type="button">Simpan</button>
-  <p class="msg" id="msg" role="status"></p>
-  <p class="how">Cara menguji update: simpan catatan di sini, lalu pasang build berikutnya di atas versi ini. Setelah dibuka lagi, catatan dan jumlah dibuka harus tetap ada, sedangkan nomor build naik.</p>
-</main>
-<script>
-var store = {
-  get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
-};
-var opens = parseInt(store.get('cpnsku:opens') || '0', 10) + 1;
-store.set('cpnsku:opens', String(opens));
-document.getElementById('opens').textContent = opens;
-var note = document.getElementById('note');
-note.value = store.get('cpnsku:note') || '';
-document.getElementById('save').addEventListener('click', function () {
-  var ok = store.set('cpnsku:note', note.value);
-  document.getElementById('msg').textContent = ok ? 'Catatan tersimpan.' : 'Catatan gagal disimpan.';
-});
-</script>
+<header id="bar">
+  <button id="back" class="icon" aria-label="Kembali" hidden><svg viewBox="0 0 24 24" width="24" height="24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <h1 id="title">CPNSku</h1>
+  <button id="gear" class="icon" aria-label="Pengaturan"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"/></svg></button>
+</header>
+<main id="view"></main>
+<nav id="tabs"></nav>
+<div id="toast" role="status"></div>
+<script src="app.js"></script>
 </body>
 </html>
